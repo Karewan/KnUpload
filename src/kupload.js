@@ -37,9 +37,7 @@
 
 		// Prepare files for upload
 		var prepareFiles = function(files) {
-			// Error
-			var error = false;
-			var totalsize = 0;
+			// Upload in progress
 			upinprogress = true;
 
 			// Callback
@@ -48,11 +46,13 @@
 			// Check if too many files
 			if(files.length > opt.maxfiles) {
 				opt.onTooManyFiles.call();
+				upinprogress = false;
 				return;
 			}
 
 			// The files
 			var final_files = [];
+			var totalsize = 0;
 
 			// For each files
 			for(var i in files) {
@@ -66,8 +66,8 @@
 				totalsize += file.size;
 				if(file.size > opt.maxfilesize || totalsize > opt.maxfilesize) {
 					opt.onFileSizeError.call();
-					error = true;
-					break;
+					upinprogress = false;
+					return;
 				}
 
 				// Push the file to the array
@@ -75,12 +75,6 @@
 
 				// If multiple file upload is disabled
 				if(!opt.multiple) break;
-			}
-
-			// If error cancel upload
-			if(error) {
-				upinprogress = false;
-				return;
 			}
 
 			// Callback
