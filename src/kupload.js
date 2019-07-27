@@ -65,7 +65,7 @@
 				// If files are too big
 				totalsize += file.size;
 				if(file.size > opt.maxfilesize || totalsize > opt.maxfilesize) {
-					opt.onFileSizeError.call(this, file.name);
+					opt.onFileSizeError.call();
 					error = true;
 					break;
 				}
