@@ -1,0 +1,9 @@
+# Force LF for all text files
+* text=auto eol=lf
+*.php eol=lf
+*.json eol=lf
+*.xml eol=lf
+*.txt eol=lf
+*.html eol=lf
+*.css eol=lf
+*.js eol=lf
