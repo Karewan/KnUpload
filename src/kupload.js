@@ -111,7 +111,7 @@
 				fd.append('file_'+i+'_infos', JSON.stringify({
 					name: files[i].filename,
 					orig_size: files[i].orig_size,
-					compressed: files[i].compressed === true ? 1 : 0,
+					compressed: files[i].compressed,
 				}));
 			}
 
