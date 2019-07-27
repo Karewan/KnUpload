@@ -1,6 +1,6 @@
 /**
  * kupload v1.0.0 - Copyright (c) 2019 Nogema Technology SAS
- * Released under proprietary licence, all rights reserved
+ * Released under proprietary license, all rights reserved
  */
 "use strict";
 (function($) {
