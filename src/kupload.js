@@ -40,15 +40,15 @@
 			// Upload in progress
 			upinprogress = true;
 
-			// Callback
-			opt.onNewFiles.call(this, files);
-
 			// Check if too many files
 			if(files.length > opt.maxfiles) {
 				opt.onTooManyFiles.call();
 				upinprogress = false;
 				return;
 			}
+
+			// Callback
+			opt.onNewFiles.call(this, files);
 
 			// The files
 			var final_files = [];
