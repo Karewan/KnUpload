@@ -1,6 +1,6 @@
 /**
- * kupload v1.0.0 - Copyright (c) 2019 Nogema Technology SAS
- * Released under proprietary license, all rights reserved
+ * kupload v1.0.1 - Copyright (c) 2019-2020 Florent VIALATTE
+ * Released under the MIT license
  */
 "use strict";
 (function($) {
@@ -13,8 +13,7 @@
 		var upinprogress = false;
 		if(!opt) opt = {};
 		if(!opt.url) throw 'upload URL is mandatory';
-		if(!opt.multiple) opt.multiple = false; // No multiple
-		if(!opt.maxfiles) opt.maxfiles = 3; // 3 files max by default
+		if(!opt.maxfiles) opt.maxfiles = 1; // 1 files max by default
 		if(!opt.compress) opt.compress = false; // No compress
 		if(opt.compress && !opt.pakoDeflatePath) throw 'pakoDeflatePath is mandatory if compress';
 		if(!opt.timeout) opt.timeout = 0; // No timeout
@@ -72,9 +71,6 @@
 
 				// Push the file to the array
 				final_files.push(files[i]);
-
-				// If multiple file upload is disabled
-				if(!opt.multiple) break;
 			}
 
 			// Callback
@@ -109,9 +105,13 @@
 				}));
 			}
 
+			var url;
+			if(opt.url instanceof Function) url = opt.url();
+			else url = opt.url;
+
 			$.ajax({
 				type: 'POST',
-				url: opt.url,
+				url: url,
 				data: fd,
 				processData: false,
 				contentType: false,
@@ -136,7 +136,7 @@
 		};
 
 		// Init the worker
-		var workerScript = "'use strict';var act=['','text/css','text/javascript','text/xml','text/plain','text/html','text/x-component','application/javascript','application/x-javascript','application/json','application/manifest+json','application/xml','application/xhtml+xml','application/rss+xml','application/atom+xml','application/rdf+xml','application/vnd.ms-fontobject','font/truetype','font/opentype','font/ttf','font/eot','font/otf','application/x-font-ttf','application/x-font-opentype','application/x-font-truetype','image/svg+xml','image/x-icon','image/vnd.microsoft.icon'];self.addEventListener('message',function(e){if(e.data.pakoDeflatePath){importScripts(e.data.pakoDeflatePath);return}var files=e.data.files;var compress=e.data.compress;var final_res=[];for(var i in files){var can_compress=!1;var file=files[i];if(compress&&file.size>100&&act.indexOf(file.type)>-1)can_compress=!0;var content;if(can_compress)content=pako.gzip((new FileReaderSync()).readAsArrayBuffer(file),{level:1});else content=(new FileReaderSync()).readAsArrayBuffer(file);final_res.push({filename:file.name,orig_size:file.size,compressed:can_compress,content:new Blob([content])})}self.postMessage(final_res)},!1)";
+		var workerScript = "'use strict';self.addEventListener('message',e=>{if(e.data.pakoDeflatePath){importScripts(e.data.pakoDeflatePath);return}var files=e.data.files;var compress=e.data.compress;var final_res=[];for(var i in files){var file=files[i];var content;if(compress)content=pako.gzip((new FileReaderSync()).readAsArrayBuffer(file),{level:1});else content=(new FileReaderSync()).readAsArrayBuffer(file);final_res.push({filename:file.name,orig_size:file.size,compressed:compress,content:new Blob([content])})}self.postMessage(final_res)},!1)";
 		var workerBlob;
 		try {
 			workerBlob = new Blob([workerScript], {type: 'application/javascript'});
