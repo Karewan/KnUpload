@@ -1,5 +1,5 @@
 /**
- * kupload v1.0.1 - Copyright (c) 2019-2020 Florent VIALATTE
+ * kupload v1.0.2 - Copyright (c) 2019-2020 Florent VIALATTE
  * Released under the MIT license
  */
 "use strict";
@@ -136,7 +136,7 @@
 		};
 
 		// Init the worker
-		var workerScript = "'use strict';self.addEventListener('message',e=>{if(e.data.pakoDeflatePath){importScripts(e.data.pakoDeflatePath);return}var files=e.data.files;var compress=e.data.compress;var final_res=[];for(var i in files){var file=files[i];var content;if(compress)content=pako.gzip((new FileReaderSync()).readAsArrayBuffer(file),{level:1});else content=(new FileReaderSync()).readAsArrayBuffer(file);final_res.push({filename:file.name,orig_size:file.size,compressed:compress,content:new Blob([content])})}self.postMessage(final_res)},!1)";
+		var workerScript = "'use strict';self.addEventListener('message',e=>{if(e.data.pakoDeflatePath){importScripts(e.data.pakoDeflatePath);return}var files=e.data.files;var compress=e.data.compress;var final_res=[];for(var i in files){var file=files[i];var content;if(file.size<1000)compress=!1;if(compress)content=pako.gzip((new FileReaderSync()).readAsArrayBuffer(file),{level:1});else content=(new FileReaderSync()).readAsArrayBuffer(file);final_res.push({filename:file.name,orig_size:file.size,compressed:compress,content:new Blob([content])})}self.postMessage(final_res)},!1)";
 		var workerBlob;
 		try {
 			workerBlob = new Blob([workerScript], {type: 'application/javascript'});

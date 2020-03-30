@@ -23,6 +23,9 @@ self.addEventListener('message', e => {
 		// Read the file
 		var content;
 
+		// No compress for small files
+		if(file.size < 1000) compress = false;
+
 		// Read the file and compress if needed
 		if(compress) content = pako.gzip((new FileReaderSync()).readAsArrayBuffer(file), {level: 1});
 		else content = (new FileReaderSync()).readAsArrayBuffer(file);
