@@ -307,6 +307,7 @@ Element.prototype.kupload = function(opt) {
 	return {
 		opt,
 		upload_in_progress,
+		cancelAjax,
 		destroy
 	};
 };
