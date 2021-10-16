@@ -1,4 +1,5 @@
 const gulp = require('gulp'),
+fs = require('fs'),
 rename = require('gulp-rename'),
 terser = require('gulp-terser'),
 header_comment = require('gulp-header-comment');
@@ -18,23 +19,45 @@ const terser_options = {
 		ecma: '2015',
 		quote_style: 3
 	}
-};
+},
+header_txt= `
+	kupload v<%= pkg.version %> (<%= moment().format('YYYY-MM-DD HH:mm:ss ZZ') %>)
+	Copyright (c) 2019-2021 <%= pkg.author %>
+	Released under the MIT license
+`;
 
-gulp.task('build-inline-worker', function() {
+gulp.task('minify-worker', function() {
 	return gulp.src('src/kupload-worker.js')
 		.pipe(terser(terser_options))
 		.pipe(rename('kupload-inline-worker.js'))
 		.pipe(gulp.dest('dist'));
 });
 
-gulp.task('build', function() {
-	return gulp.src('src/kupload.js')
+gulp.task('add-inline-worker', function(done) {
+	try {
+		let main_src = fs.readFileSync('src/kupload.js', 'utf8');
+		let worker_script = fs.readFileSync('dist/kupload-inline-worker.js', 'utf8');
+
+		let inline_pos = main_src.indexOf('WORKER_INLINE_SCRIPT = "') + 24,
+		end_inline_pos = main_src.indexOf('";', inline_pos);
+
+		fs.writeFileSync('dist/kupload.js', main_src.substring(0, inline_pos) + worker_script  + main_src.substring(end_inline_pos), 'utf8');
+	} catch(e) {
+		console.log('Error:', e.stack);
+	}
+
+	done();
+});
+
+gulp.task('minify-main', function() {
+	return gulp.src('dist/kupload.js')
+		.pipe(header_comment(header_txt))
+		.pipe(gulp.dest('dist'))
 		.pipe(terser(terser_options))
-		.pipe(header_comment(`
-			kupload v<%= pkg.version %> (<%= moment().format('YYYY-MM-DD HH:mm:ss ZZ') %>)
-			Copyright (c) 2019-2021 <%= pkg.author %>
-			Released under the MIT license
-		`))
+		.pipe(header_comment(header_txt))
 		.pipe(rename('kupload.min.js'))
 		.pipe(gulp.dest('dist'));
 });
+
+gulp.task('build', gulp.series('minify-worker', 'add-inline-worker', 'minify-main'));
+
