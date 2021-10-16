@@ -50,13 +50,14 @@
 
 	<div draggable><p>trest</p></div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.22.0/axios.min.js"></script>
-	<script src="../src/kupload2.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
+	<script src="../src/kupload.js"></script>
 	<script>
 	let zone = document.getElementById('zone'),
 	txt_status = document.getElementById('txt_status'),
 	zone_instance = zone.kupload({
 		url: 'https://lan.karewan.ovh/test.php',
+		data: { name: 'Le devis TourGest' },
 		headers: { 'x-csrf': '838da7ac74d22a0d5b25048632f6eb4ae4ec3c6c007613ecd83336f348f75aa7' },
 		max_files: 3,
 		compress: true,
