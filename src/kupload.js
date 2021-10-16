@@ -245,9 +245,10 @@ Element.prototype.kupload = function(opt) {
 		});
 
 		// Put additional data in form data
-		for(const [k, v] of Object.entries(opt.data)) fd.append(k, v);
+		for(const [k, v] of Object.entries(opt.data)) fd.append(k, (typeof v === 'function') ? v() : v);
 
-		// Form data header
+		// Headers
+		for(const [k, v] of Object.entries(opt.headers)) opt.headers[k] =( typeof v === 'function') ? v() : v;
 		opt.headers['Content-Type'] = 'multipart/form-data';
 
 		// Upload

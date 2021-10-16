@@ -1,5 +1,5 @@
 /**
- * kupload v2.0.1 (2021-10-16 15:30:39 +0200)
+ * kupload v2.0.1 (2021-10-16 23:39:31 +0200)
  * Copyright (c) 2019-2021 Florent VIALATTE
  * Released under the MIT license
  */
@@ -251,9 +251,10 @@ Element.prototype.kupload = function(opt) {
 		});
 
 		// Put additional data in form data
-		for(const [k, v] of Object.entries(opt.data)) fd.append(k, v);
+		for(const [k, v] of Object.entries(opt.data)) fd.append(k, (typeof v === 'function') ? v() : v);
 
-		// Form data header
+		// Headers
+		for(const [k, v] of Object.entries(opt.headers)) opt.headers[k] =( typeof v === 'function') ? v() : v;
 		opt.headers['Content-Type'] = 'multipart/form-data';
 
 		// Upload
