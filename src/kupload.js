@@ -1,7 +1,7 @@
 'use strict';
 
 const kupload = function() {
-	const VERSION = '2.0.1',
+	const VERSION = '2.0.2',
 	WORKER_INLINE_SCRIPT = "";
 
 	let worker;
@@ -89,6 +89,7 @@ Element.prototype.kupload = function(opt) {
 
 	function onWorkerMessage(e) {
 		console.log('kupload.onWorkerMessage()', e);
+		if(!upload_in_progress) return;
 		upload(e.data);
 	}
 
@@ -306,10 +307,16 @@ Element.prototype.kupload = function(opt) {
 		cancelAjax();
 	}
 
+	function cancel() {
+		console.log('kupload.cancel()');
+		upload_in_progress = false;
+		cancelAjax();
+	}
+
 	return {
 		opt,
 		upload_in_progress,
-		cancelAjax,
+		cancel,
 		destroy
 	};
 };
