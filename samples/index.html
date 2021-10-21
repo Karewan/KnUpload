@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>kupload test</title>
+	<title>KnUpload test</title>
 	<style type="text/css">
 	html, body {
 		font-family: sans-serif;
@@ -51,11 +51,11 @@
 	<div draggable><p>trest</p></div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
-	<script src="../dist/kupload.js"></script>
+	<script src="../dist/kn_upload.js"></script>
 	<script>
 	let zone = document.getElementById('zone'),
 	txt_status = document.getElementById('txt_status'),
-	zone_instance = zone.kupload({
+	zone_instance = zone.KnUpload({
 		url: 'https://lan.karewan.ovh/test.php',
 		data: { name: 'Le devis TourGest' },
 		headers: { 'x-csrf': '838da7ac74d22a0d5b25048632f6eb4ae4ec3c6c007613ecd83336f348f75aa7' },

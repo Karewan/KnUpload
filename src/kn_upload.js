@@ -1,18 +1,18 @@
 'use strict';
 
-const kupload = function() {
-	const VERSION = '2.0.2',
+const KnUpload = function() {
+	const VERSION = '2.0.3',
 	WORKER_INLINE_SCRIPT = "";
 
 	let worker;
 
 	function getWorker() {
 		if(worker) {
-			console.log('kupload.getWorker() reuse the worker');
+			console.log('KnUpload.getWorker() reuse the worker');
 			return worker;
 		}
 
-		console.log('kupload.getWorker() init a new worker');
+		console.log('KnUpload.getWorker() init a new worker');
 
 		let worker_blob;
 
@@ -34,10 +34,10 @@ const kupload = function() {
 	}
 }();
 
-Element.prototype.kupload = function(opt) {
-	console.log('Element.prototype.kupload()', opt);
+Element.prototype.KnUpload = function(opt) {
+	console.log('Element.prototype.KnUpload()', opt);
 
-	const acm = 'kupload_canceled';
+	const acm = 'kn_upload_acm';
 
 	let zone = this,
 	input = zone.querySelector('input[type=file]'),
@@ -69,7 +69,7 @@ Element.prototype.kupload = function(opt) {
 	if(opt.max_files > 1) input.setAttribute('multiple', '');
 	else input.removeAttribute('multiple');
 
-	kupload.getWorker().addEventListener('message', onWorkerMessage, false);
+	KnUpload.getWorker().addEventListener('message', onWorkerMessage, false);
 	zone.addEventListener('click', onClick);
 	input.addEventListener('change', onInputChange);
 	zone.addEventListener('drop', onDrop);
@@ -88,20 +88,20 @@ Element.prototype.kupload = function(opt) {
 	}
 
 	function onWorkerMessage(e) {
-		console.log('kupload.onWorkerMessage()', e);
+		console.log('KnUpload.onWorkerMessage()', e);
 		if(!upload_in_progress) return;
 		upload(e.data);
 	}
 
 	function onClick(e) {
-		console.log('kupload.onClick()', e);
+		console.log('KnUpload.onClick()', e);
 		if(!upload_in_progress) return;
 		e.stopPropagation();
 		e.preventDefault();
 	}
 
 	function onInputChange(e) {
-		console.log('kupload.onInputChange()', e);
+		console.log('KnUpload.onInputChange()', e);
 		if(upload_in_progress) return;
 
 		// Files
@@ -115,7 +115,7 @@ Element.prototype.kupload = function(opt) {
 	}
 
 	function onDrop(e) {
-		console.log('kupload.onDrop()', e);
+		console.log('KnUpload.onDrop()', e);
 		e.stopPropagation();
 		e.preventDefault();
 		if(upload_in_progress) return;
@@ -134,7 +134,7 @@ Element.prototype.kupload = function(opt) {
 	}
 
 	function onDragEnter(e) {
-		console.log('kupload.onDragEnter()', e);
+		console.log('KnUpload.onDragEnter()', e);
 		e.stopPropagation();
 		e.preventDefault();
 		if(upload_in_progress) return;
@@ -144,13 +144,13 @@ Element.prototype.kupload = function(opt) {
 	}
 
 	function onDragOver(e) {
-		//console.log('kupload.onDragOver()', e);
+		//console.log('KnUpload.onDragOver()', e);
 		e.stopPropagation();
 		e.preventDefault();
 	}
 
 	function onDragLeave(e) {
-		console.log('kupload.onDragLeave()', e);
+		console.log('KnUpload.onDragLeave()', e);
 		e.stopPropagation();
 		e.preventDefault();
 		if(upload_in_progress) return;
@@ -160,14 +160,14 @@ Element.prototype.kupload = function(opt) {
 	}
 
 	function onKillDad(e) {
-		//console.log('kupload.onKillDad()', e);
+		//console.log('KnUpload.onKillDad()', e);
 		e.stopPropagation();
 		e.preventDefault();
 		return false;
 	}
 
 	function processFiles(files) {
-		console.log('kupload.processFiles()', files);
+		console.log('KnUpload.processFiles()', files);
 
 		// Upload in progress
 		upload_in_progress = true;
@@ -207,28 +207,28 @@ Element.prototype.kupload = function(opt) {
 		if(opt.onBeforeUpload) opt.onBeforeUpload.call();
 
 		// Send files to the worker
-		kupload.getWorker().postMessage({
+		KnUpload.getWorker().postMessage({
 			compress: opt.compress,
 			files: files_to_read
 		});
 	}
 
 	function cancelAjax() {
-		console.log('kupload.cancelAjax()');
+		console.log('KnUpload.cancelAjax()');
 		if(ajax_cancel_source == null) return;
 		ajax_cancel_source.cancel(acm);
 		ajax_cancel_source = null;
 	}
 
 	function genCancelToken() {
-		console.log('kupload.genCancelToken()');
+		console.log('KnUpload.genCancelToken()');
 		cancelAjax();
 		ajax_cancel_source = axios.CancelToken.source();
 		return ajax_cancel_source.token;
 	}
 
 	function upload(files) {
-		console.log('kupload.upload()', files);
+		console.log('KnUpload.upload()', files);
 
 		// Callback
 		if(opt.onUploadProgress) opt.onUploadProgress.call(this, 0);
@@ -260,23 +260,23 @@ Element.prototype.kupload = function(opt) {
 			cancelToken: genCancelToken()
 		})
 		.then(res => {
-			console.log('kupload.upload() success()', res);
+			console.log('KnUpload.upload() success()', res);
 			if(opt.onUploadSuccess) opt.onUploadSuccess.call(this, res);
 		})
 		.catch(error => {
-			console.log('kupload.upload() error()', error);
+			console.log('KnUpload.upload() error()', error);
 			if(error.message && error.message == acm) return;
 			if(opt.onUploadError) opt.onUploadError.call(this, error);
 		})
 		.then(() => {
-			console.log('kupload.upload() always()');
+			console.log('KnUpload.upload() always()');
 			if(opt.onAjaxComplete) opt.onAjaxComplete.call();
 			upload_in_progress = false;
 		});
 	}
 
 	function onUploadProgress(e) {
-		console.log('kupload.onUploadProgress()', e);
+		console.log('KnUpload.onUploadProgress()', e);
 		if(typeof e === 'undefined' || !e.lengthComputable) return;
 		let pourcent = Math.floor((e.loaded * 100)/e.total);
 		if(opt.onUploadProgress) opt.onUploadProgress.call(this, pourcent);
@@ -284,9 +284,9 @@ Element.prototype.kupload = function(opt) {
 	}
 
 	function destroy() {
-		console.log('Element.prototype.kupload.destroy()');
+		console.log('Element.prototype.KnUpload.destroy()');
 
-		kupload.getWorker().removeEventListener('message', onWorkerMessage, false);
+		KnUpload.getWorker().removeEventListener('message', onWorkerMessage, false);
 		zone.removeEventListener('click', onClick);
 		input.removeEventListener('change', onInputChange);
 		zone.removeEventListener('drop', onDrop);
@@ -308,7 +308,7 @@ Element.prototype.kupload = function(opt) {
 	}
 
 	function cancel() {
-		console.log('kupload.cancel()');
+		console.log('KnUpload.cancel()');
 		upload_in_progress = false;
 		cancelAjax();
 	}

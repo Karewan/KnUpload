@@ -21,27 +21,27 @@ const terser_options = {
 	}
 },
 header_txt= `
-	kupload v<%= pkg.version %> (<%= moment().format('YYYY-MM-DD HH:mm:ss ZZ') %>)
+	KnUpload v<%= pkg.version %> (<%= moment().format('YYYY-MM-DD HH:mm:ss ZZ') %>)
 	Copyright (c) 2019-2021 <%= pkg.author %>
 	Released under the MIT license
 `;
 
 gulp.task('minify-worker', function() {
-	return gulp.src('src/kupload-worker.js')
+	return gulp.src('src/kn_upload_worker.js')
 		.pipe(terser(terser_options))
-		.pipe(rename('kupload-inline-worker.js'))
+		.pipe(rename('kn_upload_inline_worker.js'))
 		.pipe(gulp.dest('dist'));
 });
 
 gulp.task('add-inline-worker', function(done) {
 	try {
-		let main_src = fs.readFileSync('src/kupload.js', 'utf8');
-		let worker_script = fs.readFileSync('dist/kupload-inline-worker.js', 'utf8');
+		let main_src = fs.readFileSync('src/kn_upload.js', 'utf8');
+		let worker_script = fs.readFileSync('dist/kn_upload_inline_worker.js', 'utf8');
 
 		let inline_pos = main_src.indexOf('WORKER_INLINE_SCRIPT = "') + 24,
 		end_inline_pos = main_src.indexOf('";', inline_pos);
 
-		fs.writeFileSync('dist/kupload.js', main_src.substring(0, inline_pos) + worker_script  + main_src.substring(end_inline_pos), 'utf8');
+		fs.writeFileSync('dist/kn_upload.js', main_src.substring(0, inline_pos) + worker_script  + main_src.substring(end_inline_pos), 'utf8');
 	} catch(e) {
 		console.log('Error:', e.stack);
 	}
@@ -50,12 +50,12 @@ gulp.task('add-inline-worker', function(done) {
 });
 
 gulp.task('minify-main', function() {
-	return gulp.src('dist/kupload.js')
+	return gulp.src('dist/kn_upload.js')
 		.pipe(header_comment(header_txt))
 		.pipe(gulp.dest('dist'))
 		.pipe(terser(terser_options))
 		.pipe(header_comment(header_txt))
-		.pipe(rename('kupload.min.js'))
+		.pipe(rename('kn_upload.min.js'))
 		.pipe(gulp.dest('dist'));
 });
 
