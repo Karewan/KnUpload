@@ -1,5 +1,4 @@
 'use strict';
-
 const KnUpload = function() {
 	const VERSION = '2.0.3',
 	WORKER_INLINE_SCRIPT = "";
