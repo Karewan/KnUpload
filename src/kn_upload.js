@@ -1,36 +1,8 @@
 'use strict';
+
 const KnUpload = function() {
-	const VERSION = '2.0.3',
-	WORKER_INLINE_SCRIPT = "";
-
-	let worker;
-
-	function getWorker() {
-		if(worker) {
-			console.log('KnUpload.getWorker() reuse the worker');
-			return worker;
-		}
-
-		console.log('KnUpload.getWorker() init a new worker');
-
-		let worker_blob;
-
-		try {
-			worker_blob = new Blob([WORKER_INLINE_SCRIPT], {type: 'application/javascript'});
-		} catch (e) {
-			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-			worker_blob = new BlobBuilder();
-			worker_blob.append(WORKER_INLINE_SCRIPT);
-			worker_blob = worker_blob.getBlob();
-		}
-
-		return worker = new Worker((window.URL || window.webkitURL).createObjectURL(worker_blob));
-	}
-
-	return {
-		VERSION,
-		getWorker
-	}
+	const VERSION = '3.0.0';
+	return {VERSION};
 }();
 
 Element.prototype.KnUpload = function(opt) {
@@ -49,7 +21,6 @@ Element.prototype.KnUpload = function(opt) {
 	if(!opt.data) opt.data = {};
 	if(!opt.headers) opt.headers = {};
 	if(!opt.max_files) opt.max_files = 1;
-	if(!opt.compress) opt.compress = false;
 	if(!opt.timeout) opt.timeout = 0;
 	if(!opt.max_files_size) opt.max_files_size = 20971520;
 	if(!opt.kill_document_dad) opt.kill_document_dad = false;
@@ -68,7 +39,6 @@ Element.prototype.KnUpload = function(opt) {
 	if(opt.max_files > 1) input.setAttribute('multiple', '');
 	else input.removeAttribute('multiple');
 
-	KnUpload.getWorker().addEventListener('message', onWorkerMessage, false);
 	zone.addEventListener('click', onClick);
 	input.addEventListener('change', onInputChange);
 	zone.addEventListener('drop', onDrop);
@@ -84,12 +54,6 @@ Element.prototype.KnUpload = function(opt) {
 		document.addEventListener('dragover', onKillDad);
 		document.addEventListener('dragleave', onKillDad);
 		document.addEventListener('drop', onKillDad);
-	}
-
-	function onWorkerMessage(e) {
-		console.log('KnUpload.onWorkerMessage()', e);
-		if(!upload_in_progress) return;
-		upload(e.data);
 	}
 
 	function onClick(e) {
@@ -181,12 +145,14 @@ Element.prototype.KnUpload = function(opt) {
 			return;
 		}
 
-		// Vars
+		// Files to read
 		const files_to_read = [];
+
+		// Total size
 		let total_size = 0;
 
 		// For each files
-		for(let i in files) {
+		for(const i in files) {
 			// Must be an object
 			if(typeof files[i] !== 'object') continue;
 
@@ -205,11 +171,33 @@ Element.prototype.KnUpload = function(opt) {
 		// Callback
 		if(opt.onBeforeUpload) opt.onBeforeUpload.call();
 
-		// Send files to the worker
-		KnUpload.getWorker().postMessage({
-			compress: opt.compress,
-			files: files_to_read
-		});
+		// Files to upload
+		const files_to_upload = [];
+
+		// Read files
+		for(const x in files_to_read) {
+			const reader = new FileReader();
+
+			reader.onload = e => {
+				files_to_upload.push({
+					name: files_to_read[x].name,
+					content: new Blob([e.target.result])
+				});
+
+				if(files_to_upload.length == files_to_read.length && upload_in_progress) {
+					upload(files_to_upload);
+					return;
+				}
+			};
+
+			reader.onerror = err => {
+				if(opt.onUploadError) opt.onUploadError.call(this, err);
+				upload_in_progress = false;
+				return;
+			};
+
+			reader.readAsArrayBuffer(files_to_read[x]);
+		}
 	}
 
 	function cancelAjax() {
@@ -239,9 +227,7 @@ Element.prototype.KnUpload = function(opt) {
 		fd.append('nb_files', files.length);
 		files.forEach((file, i) => {
 			fd.append('file_' + i, file.content);
-			fd.append('file_' + i + '_name', file.filename);
-			fd.append('file_' + i + '_orig_size', file.orig_size);
-			fd.append('file_' + i + '_compressed', file.compressed);
+			fd.append('file_' + i + '_name', file.name);
 		});
 
 		// Put additional data in form data
@@ -285,7 +271,6 @@ Element.prototype.KnUpload = function(opt) {
 	function destroy() {
 		console.log('Element.prototype.KnUpload.destroy()');
 
-		KnUpload.getWorker().removeEventListener('message', onWorkerMessage, false);
 		zone.removeEventListener('click', onClick);
 		input.removeEventListener('change', onInputChange);
 		zone.removeEventListener('drop', onDrop);
