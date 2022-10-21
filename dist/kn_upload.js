@@ -1,25 +1,23 @@
 /**
- * KnUpload v3.0.0 (2022-06-19 13:36:42 +0200)
+ * KnUpload v3.0.1 (2022-10-21 14:04:36 +0200)
  * Copyright (c) 2019-2022 Florent VIALATTE
  * Released under the MIT license
  */
 'use strict';
 
 const KnUpload = function() {
-	const VERSION = '3.0.0';
+	const VERSION = '3.0.1';
 	return {VERSION};
 }();
 
 Element.prototype.KnUpload = function(opt) {
 	console.log('Element.prototype.KnUpload()', opt);
 
-	const acm = 'kn_upload_acm';
-
 	let zone = this,
 	input = zone.querySelector('input[type=file]'),
 	dragover = 0,
 	upload_in_progress = false,
-	ajax_cancel_source;
+	ajax_abort_ctrl;
 
 	if(!opt) opt = {};
 	if(!opt.url) throw 'URL is mandatory';
@@ -207,16 +205,16 @@ Element.prototype.KnUpload = function(opt) {
 
 	function cancelAjax() {
 		console.log('KnUpload.cancelAjax()');
-		if(ajax_cancel_source == null) return;
-		ajax_cancel_source.cancel(acm);
-		ajax_cancel_source = null;
+		if(ajax_abort_ctrl == null) return;
+		ajax_abort_ctrl.abort();
+		ajax_abort_ctrl = null;
 	}
 
-	function genCancelToken() {
-		console.log('KnUpload.genCancelToken()');
+	function genAbortSignal() {
+		console.log('KnUpload.genAbortSignal()');
 		cancelAjax();
-		ajax_cancel_source = axios.CancelToken.source();
-		return ajax_cancel_source.token;
+		ajax_abort_ctrl = new AbortController();
+		return ajax_abort_ctrl.signal;
 	}
 
 	function upload(files) {
@@ -247,7 +245,7 @@ Element.prototype.KnUpload = function(opt) {
 			timeout: opt.timeout,
 			headers: opt.headers,
 			onUploadProgress: onUploadProgress,
-			cancelToken: genCancelToken()
+			signal: genAbortSignal()
 		})
 		.then(res => {
 			console.log('KnUpload.upload() success()', res);
@@ -255,7 +253,7 @@ Element.prototype.KnUpload = function(opt) {
 		})
 		.catch(error => {
 			console.log('KnUpload.upload() error()', error);
-			if(error.message && error.message == acm) return;
+			if(error.__CANCEL__) return;
 			if(opt.onUploadError) opt.onUploadError.call(this, error);
 		})
 		.then(() => {
