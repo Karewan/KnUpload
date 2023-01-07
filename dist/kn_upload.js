@@ -1,5 +1,5 @@
 /**
- * KnUpload v4.0.0 (2023-01-07 19:35:32 +0100)
+ * KnUpload v4.0.0 (2023-01-07 19:36:38 +0100)
  * Copyright (c) 2019-2023 Florent VIALATTE
  * Released under the MIT license
  */
@@ -12,8 +12,6 @@ const KnUpload = function() {
 
 Element.prototype.KnUpload = function(opt) {
 	console.log('Element.prototype.KnUpload()', opt);
-
-	const acm = 'kn_upload_acm';
 
 	let zone = this,
 	input = zone.querySelector('input[type=file]'),

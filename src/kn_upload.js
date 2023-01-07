@@ -8,8 +8,6 @@ const KnUpload = function() {
 Element.prototype.KnUpload = function(opt) {
 	console.log('Element.prototype.KnUpload()', opt);
 
-	const acm = 'kn_upload_acm';
-
 	let zone = this,
 	input = zone.querySelector('input[type=file]'),
 	dragover = 0,
