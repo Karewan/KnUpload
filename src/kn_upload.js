@@ -1,7 +1,7 @@
 'use strict';
 
 const KnUpload = function() {
-	const VERSION = '4.0.0';
+	const VERSION = '4.0.1';
 	return {VERSION};
 }();
 
@@ -228,13 +228,13 @@ Element.prototype.KnUpload = function(opt) {
 		});
 
 		// Put additional data in form data
-		for(const [k, v] of Object.entries(opt.data)) fd.append(k, (typeof v === 'function') ? v() : v);
+		for(const [k, v] of Object.entries(typeof opt.data === 'function' ? opt.data() : opt.data)) fd.append(k, (typeof v === 'function') ? v() : v);
 
 		// Headers
 		for(const [k, v] of Object.entries(opt.headers)) opt.headers[k] =( typeof v === 'function') ? v() : v;
 
 		// Upload
-		xhr = KnHttp.postRaw(opt.url, fd, {
+		xhr = KnHttp.postRaw(typeof opt.url === 'function' ? opt.url() : opt.url, fd, {
 			upload: true,
 			timeout: opt.timeout,
 			headers: opt.headers

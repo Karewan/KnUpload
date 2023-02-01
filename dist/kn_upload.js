@@ -1,12 +1,12 @@
 /**
- * KnUpload v4.0.0 (2023-01-07 19:36:38 +0100)
+ * KnUpload v4.0.1 (2023-02-01 21:28:26 +0100)
  * Copyright (c) 2019-2023 Florent VIALATTE
  * Released under the MIT license
  */
 'use strict';
 
 const KnUpload = function() {
-	const VERSION = '4.0.0';
+	const VERSION = '4.0.1';
 	return {VERSION};
 }();
 
@@ -233,13 +233,13 @@ Element.prototype.KnUpload = function(opt) {
 		});
 
 		// Put additional data in form data
-		for(const [k, v] of Object.entries(opt.data)) fd.append(k, (typeof v === 'function') ? v() : v);
+		for(const [k, v] of Object.entries(typeof opt.data === 'function' ? opt.data() : opt.data)) fd.append(k, (typeof v === 'function') ? v() : v);
 
 		// Headers
 		for(const [k, v] of Object.entries(opt.headers)) opt.headers[k] =( typeof v === 'function') ? v() : v;
 
 		// Upload
-		xhr = KnHttp.postRaw(opt.url, fd, {
+		xhr = KnHttp.postRaw(typeof opt.url === 'function' ? opt.url() : opt.url, fd, {
 			upload: true,
 			timeout: opt.timeout,
 			headers: opt.headers
