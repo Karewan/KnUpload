@@ -7,6 +7,7 @@
 	html, body {
 		font-family: sans-serif;
 		margin: 0;
+		text-align: center;
 	}
 	#zone {
 		width: 500px;
@@ -43,65 +44,67 @@
 </head>
 <body>
 	<div id="zone">
-		<div id="txt_status">Drag and drop</div>
+		<div id="txtStatus">Drag and drop</div>
 		<label><input type="file"></label>
 	</div>
 	<button id="destroy">Destroy</button>
 
-	<div draggable><p>trest</p></div>
-
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
+	<script src="kn_http.min.js"></script>
 	<script src="../dist/kn_upload.js"></script>
 	<script>
-	let zone = document.getElementById('zone'),
-	txt_status = document.getElementById('txt_status'),
-	zone_instance = zone.KnUpload({
-		url: 'https://lan.karewan.ovh/test.php',
-		data: { name: 'Le devis TourGest' },
-		headers: { 'x-csrf': '838da7ac74d22a0d5b25048632f6eb4ae4ec3c6c007613ecd83336f348f75aa7' },
-		max_files: 3,
+	let myid = 547,
+	zone = document.getElementById('zone'),
+	txtStatus = document.getElementById('txtStatus'),
+	zoneInstance = zone.KnUpload({
+		url: 'https://mysuperurl/script.php',
+		data: {
+			id: () => myid,
+			superdata: 'mysuperbdata'
+		},
+		csrf: '838da7ac74d22a0d5b25048632f6eb4ae4ec3c6c007613ecd83336f348f75aa7',
+		maxFiles: 3,
 		timeout: 0,
-		max_files_size: 20971520,
-		kill_document_dad: true,
+		maxFilesSize: 20971520,
+		killDocumentDad: true,
 		onDragEnter: () => {
 			console.log('onDragEnter()');
-			txt_status.innerHTML = 'Drag and drop';
+			txtStatus.innerHTML = 'Drag and drop';
 			zone.style.borderColor = '#F44336';
 		},
 		onDragLeave: () => {
 			console.log('onDragLeave()');
 			zone.style.borderColor = '#DDD';
 		},
-		onNewFiles: files => {
+		onNewFiles: (files) => {
 			console.log('onNewFiles()', files);
 		},
 		onFileSizeError: () => {
 			console.log('onFileSizeError()');
-			txt_status.innerHTML = "20 Mo maximum";
+			txtStatus.innerHTML = "20 Mo maximum";
 		},
 		onTooManyFiles: () => {
 			console.log('onTooManyFiles()');
-			txt_status.innerHTML = "3 fichiers maximum";
+			txtStatus.innerHTML = "3 fichiers maximum";
 		},
 		onBeforeUpload: () => {
 			console.log('onBeforeUpload()');
-			txt_status.innerHTML = "Préparation de l'envoi du fichier";
+			txtStatus.innerHTML = "Préparation de l'envoi du fichier";
 		},
-		onUploadProgress: progress => {
+		onUploadProgress: (progress) => {
 			console.log('onUploadProgress()', progress);
-			txt_status.innerHTML = "Envoi en cours... " + progress + "%";
+			txtStatus.innerHTML = "Envoi en cours... " + progress + "%";
 		},
 		onUploadComplete: () => {
 			console.log('onUploadComplete()');
-			txt_status.innerHTML = "Fichier en cours de traitement par le serveur...";
+			txtStatus.innerHTML = "Fichier en cours de traitement par le serveur...";
 		},
-		onUploadSuccess: res => {
-			console.log('onUploadSuccess()', res);
-			txt_status.innerHTML = 'Fichier importé avec succès !';
+		onUploadSuccess: (res, headers) => {
+			console.log('onUploadSuccess()', res, headers);
+			txtStatus.innerHTML = 'Fichier importé avec succès !';
 		},
-		onUploadError: err => {
-			console.log('onUploadError()', err);
-			txt_status.innerHTML = "Une erreur est survenue lors de l'envoi du fichier";
+		onUploadError: (err, status) => {
+			console.log('onUploadError()', err, status);
+			txtStatus.innerHTML = "Une erreur est survenue lors de l'envoi du fichier";
 		},
 		onAjaxComplete: () => {
 			console.log('onAjaxComplete()');
@@ -110,7 +113,8 @@
 
 	document.getElementById('destroy').onclick = e => {
 		console.log('destroy()');
-		zone_instance.destroy();
+
+		zoneInstance.destroy();
 	};
 	</script>
 </body>

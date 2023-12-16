@@ -1,5 +1,0 @@
-v4.0.1 (01/02/2023):
-- Autorise les fonctions dans l'URL et sur l'objet data
-
-v4.0.0 (07/01/2023):
-- Migration Axios => KnHttp

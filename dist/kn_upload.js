@@ -1,12 +1,12 @@
 /**
- * KnUpload v4.0.1 (2023-02-01 21:28:26 +0100)
+ * KnUpload v5.0.0 (2023-12-16 12:50:37 +0100)
  * Copyright (c) 2019-2023 Florent VIALATTE
  * Released under the MIT license
  */
 'use strict';
 
 const KnUpload = function() {
-	const VERSION = '4.0.1';
+	const VERSION = '5.0.0';
 	return {VERSION};
 }();
 
@@ -16,17 +16,23 @@ Element.prototype.KnUpload = function(opt) {
 	let zone = this,
 	input = zone.querySelector('input[type=file]'),
 	dragover = 0,
-	upload_in_progress = false,
+	uploadInProgress = false,
 	xhr = null;
 
 	if(!opt) opt = {};
 	if(!opt.url) throw 'URL is mandatory';
 	if(!opt.data) opt.data = {};
+	if(!opt.responseType) opt.responseType = null;
 	if(!opt.headers) opt.headers = {};
-	if(!opt.max_files) opt.max_files = 1;
+	if(!opt.csrf) opt.csrf = null;
+	if(!opt.csrfHeader) opt.csrfHeader = null;
+	if(!opt.withCredentials) opt.withCredentials = null;
+	if(!opt.basicAuth) opt.basicAuth = null;
+	if(!opt.bearerAuthToken) opt.bearerAuthToken = null;
+	if(!opt.maxFiles) opt.maxFiles = 1;
 	if(!opt.timeout) opt.timeout = 0;
-	if(!opt.max_files_size) opt.max_files_size = 20971520;
-	if(!opt.kill_document_dad) opt.kill_document_dad = false;
+	if(!opt.maxFilesSize) opt.maxFilesSize = 20971520;
+	if(!opt.killDocumentDad) opt.killDocumentDad = false;
 	if(!opt.onDragEnter) opt.onDragEnter = null;
 	if(!opt.onDragLeave) opt.onDragLeave = null;
 	if(!opt.onNewFiles) opt.onNewFiles = null;
@@ -39,7 +45,7 @@ Element.prototype.KnUpload = function(opt) {
 	if(!opt.onUploadError) opt.onUploadError = null;
 	if(!opt.onAjaxComplete) opt.onAjaxComplete = null;
 
-	if(opt.max_files > 1) input.setAttribute('multiple', '');
+	if(opt.maxFiles > 1) input.setAttribute('multiple', '');
 	else input.removeAttribute('multiple');
 
 	zone.addEventListener('click', onClick);
@@ -49,7 +55,7 @@ Element.prototype.KnUpload = function(opt) {
 	zone.addEventListener('dragover', onDragOver);
 	zone.addEventListener('dragleave', onDragLeave);
 
-	if(opt.kill_document_dad) {
+	if(opt.killDocumentDad) {
 		document.addEventListener('drag', onKillDad);
 		document.addEventListener('dragstart', onKillDad);
 		document.addEventListener('dragend', onKillDad);
@@ -62,7 +68,7 @@ Element.prototype.KnUpload = function(opt) {
 	function onClick(e) {
 		console.log('KnUpload.onClick()', e);
 
-		if(!upload_in_progress) return;
+		if(!uploadInProgress) return;
 
 		e.stopPropagation();
 		e.preventDefault();
@@ -71,7 +77,7 @@ Element.prototype.KnUpload = function(opt) {
 	function onInputChange(e) {
 		console.log('KnUpload.onInputChange()', e);
 
-		if(upload_in_progress) return;
+		if(uploadInProgress) return;
 
 		// Files
 		if(!e.target || !e.target.files || !e.target.files.length) return;
@@ -89,7 +95,7 @@ Element.prototype.KnUpload = function(opt) {
 		e.stopPropagation();
 		e.preventDefault();
 
-		if(upload_in_progress) return;
+		if(uploadInProgress) return;
 
 		// Drag leave
 		if(dragover > 0) {
@@ -110,7 +116,7 @@ Element.prototype.KnUpload = function(opt) {
 		e.stopPropagation();
 		e.preventDefault();
 
-		if(upload_in_progress) return;
+		if(uploadInProgress) return;
 
 		if(opt.onDragEnter && dragover == 0) opt.onDragEnter.call();
 		dragover++;
@@ -128,7 +134,7 @@ Element.prototype.KnUpload = function(opt) {
 
 		e.stopPropagation();
 		e.preventDefault();
-		if(upload_in_progress) return;
+		if(uploadInProgress) return;
 
 		dragover--;
 		if(opt.onDragLeave && dragover == 0) opt.onDragLeave.call();
@@ -146,23 +152,23 @@ Element.prototype.KnUpload = function(opt) {
 		console.log('KnUpload.processFiles()', files);
 
 		// Upload in progress
-		upload_in_progress = true;
+		uploadInProgress = true;
 
 		// Callback
 		if(opt.onNewFiles) opt.onNewFiles.call(this, files);
 
 		// Check if too many files
-		if(files.length > opt.max_files) {
+		if(files.length > opt.maxFiles) {
 			if(opt.onTooManyFiles) opt.onTooManyFiles.call();
-			upload_in_progress = false;
+			uploadInProgress = false;
 			return;
 		}
 
 		// Files to read
-		const files_to_read = [];
+		const filestoRead = [];
 
 		// Total size
-		let total_size = 0;
+		let totalSize = 0;
 
 		// For each files
 		for(const i in files) {
@@ -170,46 +176,46 @@ Element.prototype.KnUpload = function(opt) {
 			if(typeof files[i] !== 'object') continue;
 
 			// If files are too big
-			total_size += files[i].size;
-			if(files[i].size > opt.max_files_size || total_size > opt.max_files_size) {
+			totalSize += files[i].size;
+			if(files[i].size > opt.maxFilesSize || totalSize > opt.maxFilesSize) {
 				if(opt.onFileSizeError) opt.onFileSizeError.call();
-				upload_in_progress = false;
+				uploadInProgress = false;
 				return;
 			}
 
 			// Push the file to the array
-			files_to_read.push(files[i]);
+			filestoRead.push(files[i]);
 		}
 
 		// Callback
 		if(opt.onBeforeUpload) opt.onBeforeUpload.call();
 
 		// Files to upload
-		const files_to_upload = [];
+		const filesToUpload = [];
 
 		// Read files
-		for(const x in files_to_read) {
+		for(const x in filestoRead) {
 			const reader = new FileReader();
 
 			reader.onload = e => {
-				files_to_upload.push({
-					name: files_to_read[x].name,
+				filesToUpload.push({
+					name: filestoRead[x].name,
 					content: new Blob([e.target.result])
 				});
 
-				if(files_to_upload.length == files_to_read.length && upload_in_progress) {
-					upload(files_to_upload);
+				if(filesToUpload.length == filestoRead.length && uploadInProgress) {
+					upload(filesToUpload);
 					return;
 				}
 			};
 
 			reader.onerror = err => {
 				if(opt.onUploadError) opt.onUploadError.call(this, err);
-				upload_in_progress = false;
+				uploadInProgress = false;
 				return;
 			};
 
-			reader.readAsArrayBuffer(files_to_read[x]);
+			reader.readAsArrayBuffer(filestoRead[x]);
 		}
 	}
 
@@ -242,7 +248,13 @@ Element.prototype.KnUpload = function(opt) {
 		xhr = KnHttp.postRaw(typeof opt.url === 'function' ? opt.url() : opt.url, fd, {
 			upload: true,
 			timeout: opt.timeout,
-			headers: opt.headers
+			responseType: opt.responseType,
+			headers: opt.headers,
+			csrf: opt.csrf,
+			csrfHeader: opt.csrfHeader,
+			withCredentials: opt.withCredentials,
+			basicAuth: opt.basicAuth,
+			bearerAuthToken: opt.bearerAuthToken
 		})
 		.onProgress(pourcent => {
 			console.log('KnUpload.upload() onProgress()', pourcent);
@@ -266,7 +278,7 @@ Element.prototype.KnUpload = function(opt) {
 			console.log('KnUpload.upload() onEnd()');
 
 			if(opt.onAjaxComplete) opt.onAjaxComplete.call();
-			upload_in_progress = false;
+			uploadInProgress = false;
 		});
 	}
 
@@ -280,7 +292,7 @@ Element.prototype.KnUpload = function(opt) {
 		zone.removeEventListener('dragover', onDragOver);
 		zone.removeEventListener('dragleave', onDragLeave);
 
-		if(opt.kill_document_dad) {
+		if(opt.killDocumentDad) {
 			document.removeEventListener('drag', onKillDad);
 			document.removeEventListener('dragstart', onKillDad);
 			document.removeEventListener('dragend', onKillDad);
@@ -296,13 +308,13 @@ Element.prototype.KnUpload = function(opt) {
 	function cancel() {
 		console.log('KnUpload.cancel()');
 
-		upload_in_progress = false;
+		uploadInProgress = false;
 		if(xhr != null) xhr.abort();
 	}
 
 	return {
 		opt,
-		upload_in_progress,
+		uploadInProgress,
 		cancel,
 		destroy
 	};
