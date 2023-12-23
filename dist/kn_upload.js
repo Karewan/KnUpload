@@ -1,8 +1,9 @@
 /**
- * KnUpload v5.0.1 (2023-12-23 16:04:22 +0100)
+ * KnUpload v5.0.1 (2023-12-23 16:23:52 +0100)
  * Copyright (c) 2019-2023 Florent VIALATTE
  * Released under the MIT license
  */
+
 'use strict';
 
 const KnUpload = function() {
@@ -22,11 +23,11 @@ Element.prototype.KnUpload = function(opt) {
 	opt = Object.assign({
 		url: null,
 		data: {},
-		responseType: null,
+		responseType: 'json',
 		headers: {},
 		csrf: null,
-		csrfHeader: null,
-		withCredentials: null,
+		csrfHeader: 'X-CSRF',
+		withCredentials: false,
 		basicAuth: null,
 		bearerAuthToken: null,
 		maxFiles: 1,
