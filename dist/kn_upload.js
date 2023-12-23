@@ -1,9 +1,8 @@
 /**
- * KnUpload v5.0.1 (2023-12-23 16:23:52 +0100)
+ * KnUpload v5.0.1 (2023-12-23 16:24:16 +0100)
  * Copyright (c) 2019-2023 Florent VIALATTE
  * Released under the MIT license
  */
-
 'use strict';
 
 const KnUpload = function() {
