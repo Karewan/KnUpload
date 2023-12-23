@@ -1,7 +1,7 @@
 'use strict';
 
 const KnUpload = function() {
-	const VERSION = '5.0.0';
+	const VERSION = '5.0.1';
 	return {VERSION};
 }();
 
@@ -14,31 +14,34 @@ Element.prototype.KnUpload = function(opt) {
 	uploadInProgress = false,
 	xhr = null;
 
-	if(!opt) opt = {};
+	opt = Object.assign({
+		url: null,
+		data: {},
+		responseType: null,
+		headers: {},
+		csrf: null,
+		csrfHeader: null,
+		withCredentials: null,
+		basicAuth: null,
+		bearerAuthToken: null,
+		maxFiles: 1,
+		timeout: 0,
+		maxFilesSize: 20971520,
+		killDocumentDad: false,
+		onDragEnter: null,
+		onDragLeave: null,
+		onNewFiles: null,
+		onFileSizeError: null,
+		onTooManyFiles: null,
+		onBeforeUpload: null,
+		onUploadProgress: null,
+		onUploadComplete: null,
+		onUploadSuccess: null,
+		onUploadError: null,
+		onAjaxComplete: null
+	}, opt || {});
+
 	if(!opt.url) throw 'URL is mandatory';
-	if(!opt.data) opt.data = {};
-	if(!opt.responseType) opt.responseType = null;
-	if(!opt.headers) opt.headers = {};
-	if(!opt.csrf) opt.csrf = null;
-	if(!opt.csrfHeader) opt.csrfHeader = null;
-	if(!opt.withCredentials) opt.withCredentials = null;
-	if(!opt.basicAuth) opt.basicAuth = null;
-	if(!opt.bearerAuthToken) opt.bearerAuthToken = null;
-	if(!opt.maxFiles) opt.maxFiles = 1;
-	if(!opt.timeout) opt.timeout = 0;
-	if(!opt.maxFilesSize) opt.maxFilesSize = 20971520;
-	if(!opt.killDocumentDad) opt.killDocumentDad = false;
-	if(!opt.onDragEnter) opt.onDragEnter = null;
-	if(!opt.onDragLeave) opt.onDragLeave = null;
-	if(!opt.onNewFiles) opt.onNewFiles = null;
-	if(!opt.onFileSizeError) opt.onFileSizeError = null;
-	if(!opt.onTooManyFiles) opt.onTooManyFiles = null;
-	if(!opt.onBeforeUpload) opt.onBeforeUpload = null;
-	if(!opt.onUploadProgress) opt.onUploadProgress = null;
-	if(!opt.onUploadComplete) opt.onUploadComplete = null;
-	if(!opt.onUploadSuccess) opt.onUploadSuccess = null;
-	if(!opt.onUploadError) opt.onUploadError = null;
-	if(!opt.onAjaxComplete) opt.onAjaxComplete = null;
 
 	if(opt.maxFiles > 1) input.setAttribute('multiple', '');
 	else input.removeAttribute('multiple');

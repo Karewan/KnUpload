@@ -1,6 +1,10 @@
 KnUpload Changelog
 ==========
 
+v5.0.1 (2023-12-23):
+----------------------------
+* Use Object.assign to set default options
+
 v5.0.0 (2023-12-16):
 ----------------------------
 * Add the ability to use more KnHttpJS parameters in the upload request
