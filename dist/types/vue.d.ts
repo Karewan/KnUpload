@@ -1,4 +1,4 @@
-import type { KnHttpError, KnHttpResponse, KnUploadInstance, KnUploadOptions, KnUploadRejection, KnUploadReport, KnUploadSettings } from 'kn-upload';
+import type { KnHttpError, KnHttpResponse, KnUploadInstance, KnUploadOptions, KnUploadRejection, KnUploadReport, KnUploadSettings } from '@karewan/kn-upload';
 import { type MaybeRefOrGetter, type PropType, type Ref, type ShallowRef, type SlotsType } from 'vue';
 /**
  * Status of a file

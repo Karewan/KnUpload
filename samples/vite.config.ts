@@ -59,8 +59,8 @@ export default defineConfig({
 	resolve: {
 		// The Vue sample imports the sources of KnUpload
 		alias: [
-			{ find: /^kn-upload\/vue$/, replacement: '/src/vue.ts' },
-			{ find: /^kn-upload$/, replacement: '/src/kn-upload.ts' }
+			{ find: /^@karewan\/kn-upload\/vue$/, replacement: '/src/vue.ts' },
+			{ find: /^@karewan\/kn-upload$/, replacement: '/src/kn-upload.ts' }
 		]
 	},
 	server: {

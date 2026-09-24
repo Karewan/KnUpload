@@ -1,6 +1,14 @@
 KnUpload Changelog
 ==========
 
+v6.0.1 (2026-09-24):
+----------------------------
+* Published on npm as **@karewan/kn-upload** (the kn-upload name is not available on npm)
+	* Install: **pnpm add kn-http @karewan/kn-upload** or **npm install kn-http @karewan/kn-upload**
+	* Imports: **@karewan/kn-upload** and **@karewan/kn-upload/vue**
+	* The Vue module (**dist/vue.js**) and its declarations import **@karewan/kn-upload**
+* **publishConfig.access** set to public in package.json
+
 v6.0.0 (2026-09-24):
 ----------------------------
 ### Breaking changes

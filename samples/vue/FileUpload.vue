@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue';
-import { useKnUpload, type KnUploadItemStatus } from 'kn-upload/vue';
-import type { KnUploadRejectReason } from 'kn-upload';
+import { useKnUpload, type KnUploadItemStatus } from '@karewan/kn-upload/vue';
+import type { KnUploadRejectReason } from '@karewan/kn-upload';
 
 /**
  * Server response of the upload

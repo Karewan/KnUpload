@@ -1,5 +1,5 @@
 /**
- * KnUpload v6.0.0 (2026-09-24T12:17:38.521Z)
+ * KnUpload v6.0.1 (2026-09-24T12:26:42.641Z)
  * Copyright (c) 2019 - 2026 Florent VIALATTE
  * Released under the MIT license
  */
@@ -560,7 +560,7 @@ var KnUpload = (function(kn_http) {
 	//#endregion
 	return {
 		/** LIB VERSION */
-		VERSION: "6.0.0",
+		VERSION: "6.0.1",
 		/** MINIMUM KNHTTP VERSION REQUIRED */
 		KNHTTP_MIN_VERSION,
 		/**

@@ -1,6 +1,6 @@
 import KnHttp from 'kn-http';
-import KnUpload from 'kn-upload';
-import type { KnHttpError, KnHttpResponse, KnUploadCallbacks, KnUploadInstance, KnUploadOptions, KnUploadRejection, KnUploadReport, KnUploadSettings } from 'kn-upload';
+import KnUpload from '@karewan/kn-upload';
+import type { KnHttpError, KnHttpResponse, KnUploadCallbacks, KnUploadInstance, KnUploadOptions, KnUploadRejection, KnUploadReport, KnUploadSettings } from '@karewan/kn-upload';
 import {
 	defineComponent, h, markRaw, onScopeDispose, readonly, ref, shallowReadonly, shallowRef, toValue, watch,
 	type MaybeRefOrGetter, type PropType, type Ref, type ShallowRef, type SlotsType

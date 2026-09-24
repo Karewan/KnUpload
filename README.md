@@ -39,22 +39,22 @@ Drag & drop file upload library for the browser, based on [KnHttpJs](https://git
 ### With a package manager (ES module)
 
 ```shell
-pnpm add kn-http kn-upload
+pnpm add kn-http @karewan/kn-upload
 ```
 
 ```shell
-npm install kn-http kn-upload
+npm install kn-http @karewan/kn-upload
 ```
 
-The TypeScript declarations are included in the packages, nothing else to install.
+KnUpload is published on npm as `@karewan/kn-upload`. The TypeScript declarations are included in the packages, nothing else to install.
 
 ### Browser script (IIFE)
 
-Load KnHttpJs **first**, then KnUpload, from the `dist` folders, from `node_modules/*/dist/` or from a CDN:
+Load KnHttpJs **first**, then KnUpload, from the `dist` folders, from `node_modules/kn-http/dist/` and `node_modules/@karewan/kn-upload/dist/` or from a CDN:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/kn-http@4/dist/kn-http.iife.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/kn-upload@6/dist/kn-upload.iife.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@karewan/kn-upload@6/dist/kn-upload.iife.min.js"></script>
 ```
 
 The script defines the global `KnUpload` object.
@@ -63,10 +63,10 @@ The script defines the global `KnUpload` object.
 
 | File | Format | Usage |
 | --- | --- | --- |
-| `dist/kn-upload.js` | ES module | `import KnUpload from 'kn-upload'` (Vite, webpack, Rollup...), imports `kn-http` |
+| `dist/kn-upload.js` | ES module | `import KnUpload from '@karewan/kn-upload'` (Vite, webpack, Rollup...), imports `kn-http` |
 | `dist/kn-upload.iife.js` | Browser script | `<script>`, uses the global `KnHttp`, defines the global `KnUpload` |
 | `dist/kn-upload.iife.min.js` | Browser script (minified) | `<script>`, uses the global `KnHttp`, defines the global `KnUpload` |
-| `dist/vue.js` | ES module | `import { useKnUpload, KnUploadZone } from 'kn-upload/vue'`, imports `vue`, `kn-upload` and `kn-http` |
+| `dist/vue.js` | ES module | `import { useKnUpload, KnUploadZone } from '@karewan/kn-upload/vue'`, imports `vue`, `@karewan/kn-upload` and `kn-http` |
 | `dist/types/` | TypeScript declarations | Used automatically by TypeScript and the editors |
 
 ## Quick start
@@ -87,7 +87,7 @@ The upload zone can be any element. A click, Enter or Space on the zone opens th
 
 ```typescript
 import KnHttp from 'kn-http';
-import KnUpload from 'kn-upload';
+import KnUpload from '@karewan/kn-upload';
 
 interface UploadResult {
 	files: string[];
@@ -125,7 +125,7 @@ upload.destroy();
 
 ```javascript
 import KnHttp from 'kn-http';
-import KnUpload from 'kn-upload';
+import KnUpload from '@karewan/kn-upload';
 
 const zone = document.getElementById('zone');
 
@@ -181,7 +181,7 @@ See the browser script sample [here](samples/index.html).
 
 ## Vue 3
 
-`kn-upload/vue` contains a composable and a component (Vue >= 3.5). The zone is created when the element is mounted and destroyed with the component. See the complete Vue sample in [samples/vue](samples/vue) ([FileUpload.vue](samples/vue/FileUpload.vue) with the composable, [ImageUpload.vue](samples/vue/ImageUpload.vue) with the component).
+`@karewan/kn-upload/vue` contains a composable and a component (Vue >= 3.5). The zone is created when the element is mounted and destroyed with the component. See the complete Vue sample in [samples/vue](samples/vue) ([FileUpload.vue](samples/vue/FileUpload.vue) with the composable, [ImageUpload.vue](samples/vue/ImageUpload.vue) with the component).
 
 ### Composable: useKnUpload
 
@@ -190,7 +190,7 @@ The composable gives a reactive state, the markup stays free:
 ```vue
 <script setup lang="ts">
 import { useTemplateRef } from 'vue';
-import { useKnUpload } from 'kn-upload/vue';
+import { useKnUpload } from '@karewan/kn-upload/vue';
 
 interface UploadResult {
 	files: string[];
@@ -284,7 +284,7 @@ The component renders the zone element (`tag` prop, `div` by default) with the `
 
 ```vue
 <script setup lang="ts">
-import { KnUploadZone } from 'kn-upload/vue';
+import { KnUploadZone } from '@karewan/kn-upload/vue';
 import type { KnHttpError, KnHttpResponse } from 'kn-http';
 
 function onSuccess(res: KnHttpResponse, files: File[]) {
@@ -598,8 +598,8 @@ KnUpload.create('#zone', { url: '/upload', onUploadSuccess: () => {} }); // Erro
 ### Exported types
 
 ```typescript
-import type { KnUploadOptions, KnUploadInstance, KnUploadReport } from 'kn-upload';
-import type { KnUploadItem, UseKnUploadReturn } from 'kn-upload/vue';
+import type { KnUploadOptions, KnUploadInstance, KnUploadReport } from '@karewan/kn-upload';
+import type { KnUploadItem, UseKnUploadReturn } from '@karewan/kn-upload/vue';
 ```
 
 | Type | Description |
@@ -612,8 +612,8 @@ import type { KnUploadItem, UseKnUploadReturn } from 'kn-upload/vue';
 | `KnUploadRequestOptions` | Type of the `request` option |
 | `KnUploadValue<V>` | Value or function returning the value |
 | `KnHttpClient`, `KnHttpRequest<T>`, `KnHttpResponse<T>`, `KnHttpError`, `KnHttpOptions`, `KnHttpFormDataBody` | Re-exported from `kn-http` |
-| `KnUploadItem`, `KnUploadItemStatus` | Files of the Vue state (`kn-upload/vue`) |
-| `UseKnUploadReturn<T>`, `KnUploadSlotProps` | Vue composable result and component slot props (`kn-upload/vue`) |
+| `KnUploadItem`, `KnUploadItemStatus` | Files of the Vue state (`@karewan/kn-upload/vue`) |
+| `UseKnUploadReturn<T>`, `KnUploadSlotProps` | Vue composable result and component slot props (`@karewan/kn-upload/vue`) |
 
 ## Samples
 

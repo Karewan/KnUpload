@@ -64,7 +64,7 @@ const coreConfig = defineConfig({
 	}
 });
 
-// Vue build (vite build --mode vue): ES module only, kn-upload, kn-http and vue are external
+// Vue build (vite build --mode vue): ES module only, @karewan/kn-upload, kn-http and vue are external
 const vueConfig = defineConfig({
 	build: {
 		target: 'es2022',
@@ -77,7 +77,7 @@ const vueConfig = defineConfig({
 			formats: ['es']
 		},
 		rolldownOptions: {
-			external: ['vue', 'kn-http', 'kn-upload'],
+			external: ['vue', 'kn-http', '@karewan/kn-upload'],
 			output: {
 				format: 'es',
 				entryFileNames: 'vue.js',

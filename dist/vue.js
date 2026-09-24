@@ -1,10 +1,10 @@
 /**
- * KnUpload v6.0.0 (2026-09-24T12:17:38.772Z)
+ * KnUpload v6.0.1 (2026-09-24T12:26:42.850Z)
  * Copyright (c) 2019 - 2026 Florent VIALATTE
  * Released under the MIT license
  */
 import KnHttp from "kn-http";
-import KnUpload from "kn-upload";
+import KnUpload from "@karewan/kn-upload";
 import { defineComponent, h, markRaw, onScopeDispose, readonly, ref, shallowReadonly, shallowRef, toValue, watch } from "vue";
 //#region src/vue.ts
 /**

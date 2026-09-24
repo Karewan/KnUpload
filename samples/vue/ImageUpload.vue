@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue';
-import { KnUploadZone } from 'kn-upload/vue';
+import { KnUploadZone } from '@karewan/kn-upload/vue';
 import type { KnHttpError, KnHttpResponse } from 'kn-http';
 
 // Previews of the uploaded images

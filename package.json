@@ -1,7 +1,7 @@
 {
-	"name": "kn-upload",
+	"name": "@karewan/kn-upload",
 	"author": "Florent VIALATTE",
-	"version": "6.0.0",
+	"version": "6.0.1",
 	"description": "Drag & Drop upload library based on KnHttpJs, written in TypeScript",
 	"main": "./dist/kn-upload.js",
 	"module": "./dist/kn-upload.js",
@@ -23,6 +23,9 @@
 	"sideEffects": false,
 	"type": "module",
 	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"typecheck": "tsc --noEmit && tsc -p tsconfig.node.json && vue-tsc --noEmit -p samples/vue/tsconfig.json",
 		"build": "tsc --noEmit && tsc -p tsconfig.node.json && vite build && vite build --mode vue && tsc",
