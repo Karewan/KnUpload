@@ -1,121 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>KnUpload test</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>KnUpload browser script sample</title>
 	<style type="text/css">
-	html, body {
-		font-family: sans-serif;
-		margin: 0;
-		text-align: center;
+	body {
+		max-width: 640px;
+		margin: 0 auto;
+		padding: 32px 16px;
+		font-family: system-ui, sans-serif;
+		color: #1e293b;
+		background: #f8fafc;
 	}
+
+	/* Upload zone */
 	#zone {
-		width: 500px;
-		height: 300px;
-		margin: 10vh auto;
-		border: 2px solid #ddd;
-		position: relative;
-	}
-	#txtStatus {
+		padding: 48px 24px;
+		border: 2px dashed #cbd5e1;
+		border-radius: 12px;
+		background: #fff;
 		text-align: center;
-		line-height: 300px;
-	}
-	#zone label {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		color: transparent;
 		cursor: pointer;
+		transition: border-color .2s, background-color .2s;
 	}
-	#zone input {
-		outline: 0;
+
+	/* Mouse hover and keyboard focus (the zone is focusable) */
+	#zone:hover,
+	#zone:focus-visible {
+		border-color: #94a3b8;
+		outline: none;
+	}
+
+	/* Files dragged over the zone (class added by KnUpload) */
+	#zone.is-dragover {
+		border-color: #16a34a;
+		background: #f0fdf4;
+	}
+
+	/* Upload in progress (class added by KnUpload) */
+	#zone.is-uploading {
+		border-style: solid;
+		border-color: #16a34a;
+		cursor: progress;
+	}
+
+	/* Progress bar */
+	#progress {
+		height: 6px;
+		margin-top: 16px;
+		border-radius: 3px;
+		background: #e2e8f0;
+		overflow: hidden;
+	}
+
+	#progress div {
 		width: 0;
-		height: 0;
-		color: transparent;
-		font-size: 0;
-		background: 0 0;
-		padding: 0;
-		margin: 0;
-		visibility: hidden;
+		height: 100%;
+		background: #16a34a;
+		transition: width .2s;
+	}
+
+	/* Messages */
+	#message.success {
+		color: #15803d;
+	}
+
+	#message.error {
+		color: #b91c1c;
 	}
 	</style>
 </head>
 <body>
-	<div id="zone">
-		<div id="txtStatus">Drag and drop</div>
-		<label><input type="file"></label>
-	</div>
-	<button id="destroy">Destroy</button>
+	<h1>KnUpload browser script</h1>
 
-	<script src="kn_http.min.js"></script>
-	<script src="../dist/kn_upload.js"></script>
+	<!-- The file input is created automatically if the zone does not contain one -->
+	<div id="zone">Drop up to 3 images or PDF here, paste them or click to select them</div>
+	<div id="progress"><div></div></div>
+	<p id="message"></p>
+	<button id="cancel" type="button">Cancel</button>
+	<button id="destroy" type="button">Destroy</button>
+
+	<script src="../node_modules/kn-http/dist/kn-http.iife.min.js"></script>
+	<script src="../dist/kn-upload.iife.js"></script>
 	<script>
 	let myid = 547,
 	zone = document.getElementById('zone'),
-	txtStatus = document.getElementById('txtStatus'),
-	zoneInstance = zone.KnUpload({
-		url: 'https://mysuperurl/script.php',
-		data: {
-			id: () => myid,
+	progressBar = document.querySelector('#progress div'),
+	message = document.getElementById('message');
+
+	function showMessage(text, type) {
+		message.textContent = text;
+		message.className = type || '';
+	}
+
+	let zoneInstance = KnUpload.create(zone, {
+		url: '/api/upload',
+		data: () => ({
+			id: myid,
 			superdata: 'mysuperbdata'
+		}),
+		request: {
+			csrf: '838da7ac74d22a0d5b25048632f6eb4ae4ec3c6c007613ecd83336f348f75aa7',
+			timeout: 0
 		},
-		csrf: '838da7ac74d22a0d5b25048632f6eb4ae4ec3c6c007613ecd83336f348f75aa7',
+		accept: ['image/*', '.pdf'],
 		maxFiles: 3,
-		timeout: 0,
-		maxFilesSize: 20971520,
-		killDocumentDad: true,
-		onDragEnter: () => {
-			console.log('onDragEnter()');
-			txtStatus.innerHTML = 'Drag and drop';
-			zone.style.borderColor = '#F44336';
+		maxFileSize: 10 * 1024 * 1024,
+		maxTotalSize: 20 * 1024 * 1024,
+		paste: true,
+		preventDocumentDrop: true,
+		onFiles: (files) => {
+			console.log('onFiles()', files);
 		},
-		onDragLeave: () => {
-			console.log('onDragLeave()');
-			zone.style.borderColor = '#DDD';
+		onReject: (rejections) => {
+			console.log('onReject()', rejections);
+			showMessage(rejections.length + ' file(s) rejected: ' + rejections.map(r => r.file.name + ' (' + r.reason + ')').join(', '), 'error');
 		},
-		onNewFiles: (files) => {
-			console.log('onNewFiles()', files);
+		onStart: (files) => {
+			console.log('onStart()', files);
+			showMessage('Uploading ' + files.length + ' file(s)...');
 		},
-		onFileSizeError: () => {
-			console.log('onFileSizeError()');
-			txtStatus.innerHTML = "20 Mo maximum";
+		onProgress: (progress) => {
+			progressBar.style.width = progress + '%';
 		},
-		onTooManyFiles: () => {
-			console.log('onTooManyFiles()');
-			txtStatus.innerHTML = "3 fichiers maximum";
+		onSent: () => {
+			console.log('onSent()');
+			showMessage('The server is processing the files...');
 		},
-		onBeforeUpload: () => {
-			console.log('onBeforeUpload()');
-			txtStatus.innerHTML = "Préparation de l'envoi du fichier";
+		onSuccess: (res, files) => {
+			console.log('onSuccess()', res.data, res.headers, res.status, files);
+			showMessage(files.length + ' file(s) uploaded', 'success');
 		},
-		onUploadProgress: (progress) => {
-			console.log('onUploadProgress()', progress);
-			txtStatus.innerHTML = "Envoi en cours... " + progress + "%";
+		onError: (err, files) => {
+			console.log('onError()', err.code, err.status, err.data, err.headers, files);
+			if (err.code == KnHttp.NETWORK_ERROR) showMessage('Please check your internet connection', 'error');
+			else showMessage('Upload error: ' + err.message, 'error');
 		},
-		onUploadComplete: () => {
-			console.log('onUploadComplete()');
-			txtStatus.innerHTML = "Fichier en cours de traitement par le serveur...";
-		},
-		onUploadSuccess: (res, headers) => {
-			console.log('onUploadSuccess()', res, headers);
-			txtStatus.innerHTML = 'Fichier importé avec succès !';
-		},
-		onUploadError: (err, status) => {
-			console.log('onUploadError()', err, status);
-			txtStatus.innerHTML = "Une erreur est survenue lors de l'envoi du fichier";
-		},
-		onAjaxComplete: () => {
-			console.log('onAjaxComplete()');
+		onEnd: (report) => {
+			console.log('onEnd()', report);
+			if (report.canceled) showMessage('Upload canceled', 'error');
 		}
 	});
 
-	document.getElementById('destroy').onclick = e => {
-		console.log('destroy()');
-
-		zoneInstance.destroy();
-	};
+	document.getElementById('cancel').onclick = () => zoneInstance.cancel();
+	document.getElementById('destroy').onclick = () => zoneInstance.destroy();
 	</script>
 </body>
 </html>

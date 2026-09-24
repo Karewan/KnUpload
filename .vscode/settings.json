@@ -1,7 +1,9 @@
 {
-	"files.exclude": {
-		"**/node_modules": true,
-		"**/package-lock.json": true
+	"explorer.fileNesting.enabled": true,
+	"explorer.fileNesting.expand": false,
+	"explorer.fileNesting.patterns": {
+		"tsconfig.json": "tsconfig.*.json, env.d.ts",
+		"package.json": "package-lock.json, pnpm*",
 	},
 	"editor.detectIndentation": false,
 	"editor.insertSpaces": false,
@@ -9,9 +11,9 @@
 	"files.trimTrailingWhitespace": true,
 	"files.insertFinalNewline": true,
 	"editor.dragAndDrop": false,
-	"explorer.enableDragAndDrop": false,
 	"notebook.dragAndDropEnabled": false,
 	"files.eol": "\n",
 	"editor.renderWhitespace": "all",
-	"diffEditor.ignoreTrimWhitespace": false
+	"diffEditor.ignoreTrimWhitespace": false,
+	"npm.packageManager": "pnpm",
 }

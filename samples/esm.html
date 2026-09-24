@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>KnUpload ES module sample</title>
+	<style type="text/css">
+	body {
+		max-width: 640px;
+		margin: 0 auto;
+		padding: 32px 16px;
+		font-family: system-ui, sans-serif;
+		color: #1e293b;
+		background: #f8fafc;
+	}
+
+	/* Upload zone */
+	#zone {
+		padding: 48px 24px;
+		border: 2px dashed #cbd5e1;
+		border-radius: 12px;
+		background: #fff;
+		text-align: center;
+		cursor: pointer;
+		transition: border-color .2s, background-color .2s;
+	}
+
+	/* Mouse hover and keyboard focus (the zone is focusable) */
+	#zone:hover,
+	#zone:focus-visible {
+		border-color: #94a3b8;
+		outline: none;
+	}
+
+	/* Files dragged over the zone (class added by KnUpload) */
+	#zone.is-dragover {
+		border-color: #ea580c;
+		background: #fff7ed;
+	}
+
+	/* Upload in progress (class added by KnUpload) */
+	#zone.is-uploading {
+		border-style: solid;
+		border-color: #ea580c;
+		cursor: progress;
+	}
+
+	/* Files and their status */
+	#files {
+		padding: 0;
+		list-style: none;
+	}
+
+	#files li {
+		display: flex;
+		justify-content: space-between;
+		padding: 8px 0;
+		border-bottom: 1px solid #e2e8f0;
+	}
+
+	#files li.success {
+		color: #15803d;
+	}
+
+	#files li.error {
+		color: #b91c1c;
+	}
+	</style>
+	<script type="importmap">
+	{
+		"imports": {
+			"kn-http": "../node_modules/kn-http/dist/kn-http.js"
+		}
+	}
+	</script>
+</head>
+<body>
+	<h1>KnUpload ES module</h1>
+
+	<div id="zone">
+		<p id="txtStatus">Drop your files here, paste them or click to select them</p>
+	</div>
+	<ul id="files"></ul>
+
+	<script type="module">
+	import KnHttp from 'kn-http';
+	import KnUpload from '../dist/kn-upload.js';
+
+	console.log('KnHttp', KnHttp.VERSION, 'KnUpload', KnUpload.VERSION);
+
+	const txtStatus = document.getElementById('txtStatus'),
+	filesList = document.getElementById('files'),
+	rows = new Map();
+
+	// API client shared by the application (base URL, auth token...)
+	const api = KnHttp.create({
+		baseUrl: '/api',
+		authToken: () => localStorage.getItem('token')
+	});
+
+	// Update the row of a file
+	function setRow(file, text, status) {
+		const row = rows.get(file);
+		row.lastChild.textContent = text;
+		row.className = status || '';
+	}
+
+	// One request per file, 3 files uploaded at the same time
+	window.zoneInstance = KnUpload.create('#zone', {
+		client: api,
+		url: '/upload',
+		batch: false,
+		concurrency: 3,
+		maxFiles: 20,
+		maxFileSize: 50 * 1024 * 1024,
+		maxTotalSize: 0,
+		paste: true,
+		onStart: (files) => {
+			filesList.textContent = '';
+			rows.clear();
+
+			for (const file of files) {
+				const li = document.createElement('li');
+				li.append(document.createElement('span'), document.createElement('span'));
+				li.firstChild.textContent = file.name;
+				filesList.appendChild(li);
+				rows.set(file, li);
+				setRow(file, 'Waiting');
+			}
+		},
+		onFileProgress: (file, progress) => {
+			setRow(file, progress + '%');
+		},
+		onProgress: (progress) => {
+			txtStatus.textContent = 'Upload in progress... ' + progress + '%';
+		},
+		onSuccess: (res, files) => {
+			setRow(files[0], 'Uploaded', 'success');
+		},
+		onError: (err, files) => {
+			setRow(files[0], err.message, 'error');
+		},
+		onEnd: (report) => {
+			txtStatus.textContent = report.success ? 'All the files have been uploaded' : 'Some files have not been uploaded';
+		}
+	});
+	</script>
+</body>
+</html>
